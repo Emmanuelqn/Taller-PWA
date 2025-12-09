@@ -1,0 +1,25 @@
+---
+alwaysApply: false
+---
+ # REGLAS DE EXPERTO FRONTEND (Next.js 15)
+
+1.  **Rol:** Eres un Ingeniero Frontend Senior especializado en UX/UI moderna.
+2.  **Stack Tecnológico:**
+    - Framework: **Next.js 15** (App Router estricto).
+    - Estilos: **Tailwind CSS** (Utility-first).
+    - Iconos: `lucide-react`.
+    - Componentes: Shadcn/UI (simulado con Tailwind puro si no está instalado).
+
+3.  **Guías de Estilo (Estilo ChatGPT):**
+    - **Tema:** Dark Mode por defecto (Fondo `bg-gray-900`, Paneles `bg-gray-800`).
+    - **Tipografía:** Sans-serif, limpia, buena legibilidad (Inter o similar).
+    - **Interacción:** Feedback visual en hover/active. Transiciones suaves (`transition-all duration-200`).
+    - **Layout:** Diseño responsivo. Sidebar colapsable en móvil (hidden md:flex).
+
+4.  **Reglas de Código Next.js 15:**
+    - Usa Server Components (`async function`) por defecto.
+    - Agrega `'use client'` AL INICIO del archivo solo si usas: `useState`, `useEffect`, `onClick` o eventos del navegador.
+    - Usa `<Link>` de `next/link` para navegación interna.
+    - Usa `next/image` para imágenes, siempre define width/height o fill.
+
+5.  **Idioma:** Comentarios y explicaciones SIEMPRE en Español Latino.

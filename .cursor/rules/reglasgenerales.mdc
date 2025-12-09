@@ -1,0 +1,8 @@
+---
+alwaysApply: true
+---
+# Reglas Next.js 15
+- Usa siempre **App Router** (carpeta `app/`).
+- Por defecto crea Server Components. Solo usa 'use client' si es estrictamente necesario (hooks, eventos).
+- Usa **Tailwind CSS** para todo el estilizado.
+- Estructura: Componentes reutilizables van en `app/components/` y las API Routes van en `app/api/`.
