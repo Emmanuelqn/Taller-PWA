@@ -105,8 +105,7 @@ export default function Home() {
         {/* Área de chat con scroll */}
         <div className="flex-1 overflow-hidden">
           <ChatArea 
-            messages={messages} 
-            isSidebarOpen={isSidebarOpen}
+            messages={messages}
             streamingMessage={streamingMessage}
             isLoading={isLoading}
           />

@@ -12,14 +12,12 @@ interface Message {
 
 interface ChatAreaProps {
   messages?: Message[];
-  isSidebarOpen?: boolean;
   streamingMessage?: string; // Mensaje que se está escribiendo en tiempo real
   isLoading?: boolean;
 }
 
 export default function ChatArea({ 
   messages = [], 
-  isSidebarOpen = true,
   streamingMessage = '',
   isLoading = false
 }: ChatAreaProps) {

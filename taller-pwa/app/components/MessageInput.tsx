@@ -103,11 +103,6 @@ export default function MessageInput({
             <ArrowUp className={`w-5 h-5 ${isLoading ? 'animate-pulse' : ''}`} />
           </button>
         </div>
-
-        {/* Texto de advertencia */}
-        <p className="text-xs text-white/40 mt-3 text-center px-4">
-          ChatGPT puede cometer errores. Comprueba la información importante.
-        </p>
       </div>
     </div>
   );
