@@ -1,43 +1,113 @@
 'use client';
 
-import { MessageSquare, Plus } from 'lucide-react';
+import { MessageSquare, Plus, PanelLeftClose, PanelLeft, Trash2, Edit3 } from 'lucide-react';
 
-export default function Sidebar() {
+interface SidebarProps {
+  isOpen: boolean;
+  onToggle: () => void;
+  onNewChat: () => void;
+}
+
+export default function Sidebar({ isOpen, onToggle, onNewChat }: SidebarProps) {
   // Historial simulado
   const chatHistory = [
-    { id: 1, title: 'Conversación sobre React', date: '2024-01-15' },
-    { id: 2, title: 'Preguntas sobre Next.js', date: '2024-01-14' },
-    { id: 3, title: 'Dudas de TypeScript', date: '2024-01-13' },
-    { id: 4, title: 'Optimización de rendimiento', date: '2024-01-12' },
-    { id: 5, title: 'Configuración de Tailwind', date: '2024-01-11' },
+    { id: 1, title: 'Conversación sobre React', date: 'Hoy' },
+    { id: 2, title: 'Preguntas sobre Next.js', date: 'Ayer' },
+    { id: 3, title: 'Dudas de TypeScript', date: 'Hace 3 días' },
+    { id: 4, title: 'Optimización de rendimiento', date: 'Hace 5 días' },
+    { id: 5, title: 'Configuración de Tailwind', date: 'Hace 1 semana' },
+    { id: 6, title: 'Hooks personalizados', date: 'Hace 1 semana' },
+    { id: 7, title: 'Estado global con Context', date: 'Hace 2 semanas' },
+    { id: 8, title: 'Server Components', date: 'Hace 2 semanas' },
   ];
 
   return (
-    <aside className="w-64 bg-gray-800 text-white fixed left-0 top-0 h-screen overflow-y-auto border-r border-gray-700">
-      <div className="p-4">
-        <button className="w-full flex items-center gap-2 px-4 py-3 mb-4 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors">
-          <Plus className="w-5 h-5" />
-          <span className="font-medium">Nuevo Chat</span>
+    <>
+      {/* Toggle button cuando está cerrado */}
+      {!isOpen && (
+        <button
+          onClick={onToggle}
+          className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-[#2f2f2f] hover:bg-[#3f3f3f] transition-colors"
+          aria-label="Abrir sidebar"
+        >
+          <PanelLeft className="w-5 h-5" />
         </button>
-        
-        <div className="space-y-1">
-          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-2 mb-2">
-            Historial
-          </h3>
-          {chatHistory.map((chat) => (
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={`${
+          isOpen ? 'w-64 relative' : 'w-0 absolute'
+        } bg-[#171717] h-screen overflow-hidden transition-all duration-300 ease-in-out flex-shrink-0 border-r border-white/10 z-40`}
+      >
+        <div className={`${isOpen ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300 h-full flex flex-col`}>
+          {/* Header con toggle y nuevo chat */}
+          <div className="p-2 flex items-center gap-2">
             <button
-              key={chat.id}
-              className="w-full flex items-start gap-3 px-3 py-2.5 hover:bg-gray-700 rounded-lg transition-colors text-left group"
+              onClick={onToggle}
+              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+              aria-label="Cerrar sidebar"
             >
-              <MessageSquare className="w-4 h-4 mt-0.5 text-gray-400 group-hover:text-white flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-gray-200 truncate">{chat.title}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{chat.date}</p>
+              <PanelLeftClose className="w-5 h-5" />
+            </button>
+            
+            <button
+              onClick={onNewChat}
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-white/20 hover:bg-white/10 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              <span className="text-sm font-medium">Nuevo chat</span>
+            </button>
+          </div>
+
+          {/* Lista de chats */}
+          <div className="flex-1 overflow-y-auto px-2 py-2">
+            <div className="space-y-1">
+              {chatHistory.map((chat) => (
+                <button
+                  key={chat.id}
+                  className="w-full group flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition-colors text-left relative"
+                >
+                  <MessageSquare className="w-4 h-4 flex-shrink-0 text-white/60" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-white/90 truncate">{chat.title}</p>
+                    <p className="text-xs text-white/40 mt-0.5">{chat.date}</p>
+                  </div>
+                  
+                  {/* Botones de acción al hacer hover */}
+                  <div className="hidden group-hover:flex items-center gap-1">
+                    <button
+                      className="p-1.5 rounded hover:bg-white/20 transition-colors"
+                      aria-label="Editar"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      className="p-1.5 rounded hover:bg-white/20 transition-colors text-red-400"
+                      aria-label="Eliminar"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Footer con usuario */}
+          <div className="p-3 border-t border-white/10">
+            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-sm font-semibold">
+                U
+              </div>
+              <div className="flex-1 text-left">
+                <p className="text-sm font-medium">Usuario</p>
+                <p className="text-xs text-white/50">Cuenta gratuita</p>
               </div>
             </button>
-          ))}
+          </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 }

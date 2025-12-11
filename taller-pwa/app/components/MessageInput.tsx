@@ -1,16 +1,18 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Paperclip, Mic } from 'lucide-react';
+import { ArrowUp, Paperclip, Image as ImageIcon } from 'lucide-react';
 
 interface MessageInputProps {
   onSendMessage?: (message: string) => void;
   placeholder?: string;
+  isLoading?: boolean;
 }
 
 export default function MessageInput({
   onSendMessage,
-  placeholder = 'Escribe un mensaje...',
+  placeholder = 'Envía un mensaje',
+  isLoading = false,
 }: MessageInputProps) {
   const [message, setMessage] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -19,7 +21,8 @@ export default function MessageInput({
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      const newHeight = Math.min(textareaRef.current.scrollHeight, 200);
+      textareaRef.current.style.height = `${newHeight}px`;
     }
   }, [message]);
 
@@ -41,47 +44,69 @@ export default function MessageInput({
   };
 
   return (
-    <div className="fixed bottom-0 left-64 right-0 bg-gray-800 border-t border-gray-700">
-      <div className="max-w-4xl mx-auto px-4 py-4">
-        <div className="flex items-end gap-2 bg-gray-700 rounded-lg px-4 py-3 border border-gray-600 focus-within:border-gray-500 transition-colors">
+    <div className="w-full border-t border-white/10 bg-[#212121]">
+      <div className="max-w-3xl mx-auto px-4 py-4">
+        {/* Contenedor del input */}
+        <div className="relative flex items-end gap-2 bg-[#2f2f2f] rounded-3xl px-4 py-3 shadow-lg">
+          {/* Botón de adjuntar */}
           <button
-            className="p-2 hover:bg-gray-600 rounded-lg transition-colors text-gray-400 hover:text-white"
+            disabled={isLoading}
+            className={`shrink-0 p-2 rounded-lg transition-colors ${
+              isLoading 
+                ? 'text-white/30 cursor-not-allowed' 
+                : 'text-white/70 hover:text-white hover:bg-white/10'
+            }`}
             aria-label="Adjuntar archivo"
           >
             <Paperclip className="w-5 h-5" />
           </button>
+
+          {/* Botón de imagen */}
+          <button
+            disabled={isLoading}
+            className={`shrink-0 p-2 rounded-lg transition-colors ${
+              isLoading 
+                ? 'text-white/30 cursor-not-allowed' 
+                : 'text-white/70 hover:text-white hover:bg-white/10'
+            }`}
+            aria-label="Adjuntar imagen"
+          >
+            <ImageIcon className="w-5 h-5" />
+          </button>
           
+          {/* Textarea */}
           <textarea
             ref={textareaRef}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={placeholder}
+            placeholder={isLoading ? 'Esperando respuesta...' : placeholder}
             rows={1}
-            className="flex-1 bg-transparent text-white placeholder-gray-400 resize-none outline-none text-sm max-h-32 overflow-y-auto"
+            disabled={isLoading}
+            className={`flex-1 bg-transparent text-white placeholder-white/40 resize-none outline-none text-[15px] max-h-[200px] overflow-y-auto py-2 ${
+              isLoading ? 'cursor-not-allowed opacity-50' : ''
+            }`}
             style={{ minHeight: '24px' }}
           />
           
-          <div className="flex items-center gap-1">
-            <button
-              className="p-2 hover:bg-gray-600 rounded-lg transition-colors text-gray-400 hover:text-white"
-              aria-label="Grabar audio"
-            >
-              <Mic className="w-5 h-5" />
-            </button>
-            
-            <button
-              onClick={handleSend}
-              disabled={!message.trim()}
-              className="p-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg transition-colors text-white disabled:text-gray-400"
-              aria-label="Enviar mensaje"
-            >
-              <Send className="w-5 h-5" />
-            </button>
-          </div>
+          {/* Botón de enviar */}
+          <button
+            onClick={handleSend}
+            disabled={!message.trim() || isLoading}
+            className={`shrink-0 p-2 rounded-full transition-all ${
+              message.trim() && !isLoading
+                ? 'bg-white text-black hover:bg-white/90'
+                : 'bg-white/10 text-white/40 cursor-not-allowed'
+            }`}
+            aria-label={isLoading ? 'Enviando...' : 'Enviar mensaje'}
+          >
+            <ArrowUp className={`w-5 h-5 ${isLoading ? 'animate-pulse' : ''}`} />
+          </button>
         </div>
-        <p className="text-xs text-gray-500 mt-2 text-center">
-          Puede cometer errores. Verifica información importante.
+
+        {/* Texto de advertencia */}
+        <p className="text-xs text-white/40 mt-3 text-center px-4">
+          ChatGPT puede cometer errores. Comprueba la información importante.
         </p>
       </div>
     </div>
