@@ -67,11 +67,11 @@ export default function Sidebar({ isOpen, onToggle, onNewChat }: SidebarProps) {
                   key={chat.id}
                   role="button"
                   tabIndex={0}
-                  onClick={() => console.log('Selected chat:', chat.id)}
+                  onClick={() => { /* TODO: Implement chat selection */ }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      console.log('Selected chat:', chat.id);
+                      /* TODO: Implement chat selection */
                     }
                   }}
                   className="w-full group flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition-colors text-left relative cursor-pointer"
@@ -89,7 +89,7 @@ export default function Sidebar({ isOpen, onToggle, onNewChat }: SidebarProps) {
                       aria-label="Editar"
                       onClick={(e) => {
                         e.stopPropagation();
-                        console.log('Edit chat:', chat.id);
+                        /* TODO: Implement edit chat */
                       }}
                     >
                       <Edit3 className="w-3.5 h-3.5" />
@@ -99,7 +99,7 @@ export default function Sidebar({ isOpen, onToggle, onNewChat }: SidebarProps) {
                       aria-label="Eliminar"
                       onClick={(e) => {
                         e.stopPropagation();
-                        console.log('Delete chat:', chat.id);
+                        /* TODO: Implement delete chat */
                       }}
                     >
                       <Trash2 className="w-3.5 h-3.5" />

@@ -37,34 +37,38 @@ export default function ChatArea({
         <div className="max-w-3xl w-full text-center space-y-8">
           {/* Logo/Icono principal */}
           <div className="flex justify-center">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
               <Bot className="w-8 h-8 text-white" />
             </div>
           </div>
 
           {/* Título */}
           <div>
-            <h1 className="text-4xl font-semibold mb-3">¿En qué puedo ayudarte hoy?</h1>
+            <h1 className="text-3xl font-semibold mb-2">Analista de Requerimientos IA</h1>
+            <p className="text-white/60 max-w-lg mx-auto">
+              Describe tu proyecto, sube documentos, y obtén una predicción técnica completa 
+              con stack, equipo, tiempo y costos estimados.
+            </p>
           </div>
 
           {/* Sugerencias de ejemplo */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-2xl mx-auto">
             {[
               {
-                title: 'Crear un plan',
-                description: 'Para mejorar mi productividad diaria',
+                title: '📱 App móvil',
+                description: 'Necesito una app para delivery de comida con pagos',
               },
               {
-                title: 'Explicar un concepto',
-                description: 'De programación de forma simple',
+                title: '🛒 E-commerce',
+                description: 'Tienda en línea con carrito e inventario',
               },
               {
-                title: 'Ayuda con código',
-                description: 'Revisar y optimizar mi código',
+                title: '💼 Sistema empresarial',
+                description: 'CRM con gestión de clientes y reportes',
               },
               {
-                title: 'Generar ideas',
-                description: 'Para un proyecto creativo',
+                title: '📄 Subir documento',
+                description: 'Tengo un documento de requerimientos PDF',
               },
             ].map((suggestion, index) => (
               <button
@@ -79,6 +83,12 @@ export default function ChatArea({
                 </p>
               </button>
             ))}
+          </div>
+
+          {/* Info de tarifas */}
+          <div className="text-xs text-white/40 space-y-1">
+            <p>💡 Tarifas basadas en mercado mexicano 2026</p>
+            <p>Junior: $500/hr • Mid: $1,000/hr • Senior: $1,500/hr • Lead: $2,000/hr MXN</p>
           </div>
         </div>
       </div>

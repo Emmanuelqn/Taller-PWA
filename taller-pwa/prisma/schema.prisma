@@ -1,0 +1,296 @@
+// Prisma Schema para PWA de Análisis de Requerimientos
+// Configurado para Supabase PostgreSQL - Next.js 15 / React 19
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================================
+// MODELO: Usuario
+// ============================================================================
+model User {
+  id            String    @id @default(uuid()) @db.Uuid
+  email         String    @unique @db.VarChar(255)
+  name          String?   @db.VarChar(100)
+  avatarUrl     String?   @map("avatar_url") @db.Text
+  role          UserRole  @default(USER)
+  
+  // Timestamps
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  lastLoginAt   DateTime? @map("last_login_at") @db.Timestamptz(6)
+  
+  // Relaciones
+  chats         Chat[]
+  uploadedFiles UploadedFile[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  ANALYST
+}
+
+// ============================================================================
+// MODELO: Chat (Conversación)
+// ============================================================================
+model Chat {
+  id            String    @id @default(uuid()) @db.Uuid
+  title         String    @default("Nueva conversación") @db.VarChar(255)
+  description   String?   @db.Text
+  status        ChatStatus @default(ACTIVE)
+  
+  // Metadatos del análisis
+  projectType   ProjectType? @map("project_type")
+  isAnalysisComplete Boolean @default(false) @map("is_analysis_complete")
+  predictionGeneratedAt DateTime? @map("prediction_generated_at") @db.Timestamptz(6)
+  
+  // Timestamps
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  
+  // Relación con Usuario
+  userId        String    @map("user_id") @db.Uuid
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Relaciones
+  messages      Message[]
+  uploadedFiles UploadedFile[]
+  prediction    TechnicalPrediction?
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("chats")
+}
+
+enum ChatStatus {
+  ACTIVE
+  ARCHIVED
+  COMPLETED
+  PREDICTION_GENERATED
+}
+
+enum ProjectType {
+  MOBILE_APP
+  WEB_APP
+  ENTERPRISE_SYSTEM
+  API_BACKEND
+  ECOMMERCE
+  SAAS
+  OTHER
+}
+
+// ============================================================================
+// MODELO: Mensaje
+// ============================================================================
+model Message {
+  id            String      @id @default(uuid()) @db.Uuid
+  role          MessageRole
+  content       String      @db.Text
+  
+  // Metadatos del mensaje
+  tokenCount    Int?        @map("token_count")
+  modelUsed     String?     @map("model_used") @db.VarChar(100)
+  
+  // Para mensajes de clarificación de la IA
+  questionType  QuestionType? @map("question_type")
+  isAnswered    Boolean     @default(false) @map("is_answered")
+  
+  // Timestamps
+  createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  
+  // Relación con Chat
+  chatId        String      @map("chat_id") @db.Uuid
+  chat          Chat        @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@index([chatId])
+  @@index([createdAt])
+  @@map("messages")
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+enum QuestionType {
+  SCOPE_CLARIFICATION      // Clarificación de alcance
+  TECHNICAL_REQUIREMENT    // Requisito técnico
+  FUNCTIONAL_REQUIREMENT   // Requisito funcional
+  INTEGRATION              // Integraciones
+  SECURITY                 // Seguridad
+  SCALABILITY              // Escalabilidad
+  BUDGET_TIMELINE          // Presupuesto y tiempo
+}
+
+// ============================================================================
+// MODELO: Archivo Subido
+// ============================================================================
+model UploadedFile {
+  id              String    @id @default(uuid()) @db.Uuid
+  
+  // Información del archivo
+  fileName        String    @map("file_name") @db.VarChar(255)
+  originalName    String    @map("original_name") @db.VarChar(255)
+  mimeType        String    @map("mime_type") @db.VarChar(100)
+  fileSize        Int       @map("file_size") // En bytes
+  fileExtension   String    @map("file_extension") @db.VarChar(10)
+  
+  // Almacenamiento en Supabase
+  storagePath     String    @map("storage_path") @db.Text
+  storageUrl      String?   @map("storage_url") @db.Text
+  
+  // Texto extraído del documento
+  extractedText   String?   @map("extracted_text") @db.Text
+  textExtractionStatus TextExtractionStatus @default(PENDING) @map("text_extraction_status")
+  extractionError String?   @map("extraction_error") @db.Text
+  
+  // Análisis del documento
+  documentType    DocumentType? @map("document_type")
+  pageCount       Int?      @map("page_count")
+  wordCount       Int?      @map("word_count")
+  
+  // Timestamps
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  processedAt     DateTime? @map("processed_at") @db.Timestamptz(6)
+  
+  // Relaciones
+  userId          String    @map("user_id") @db.Uuid
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  chatId          String    @map("chat_id") @db.Uuid
+  chat            Chat      @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([chatId])
+  @@index([createdAt])
+  @@map("uploaded_files")
+}
+
+enum TextExtractionStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum DocumentType {
+  REQUIREMENTS_DOCUMENT  // Documento de requerimientos
+  USER_STORY            // Historia de usuario
+  USE_CASE              // Caso de uso
+  TECHNICAL_SPEC        // Especificación técnica
+  BUSINESS_RULES        // Reglas de negocio
+  WIREFRAME             // Wireframe/Mockup
+  CONTRACT              // Contrato
+  OTHER                 // Otro
+}
+
+// ============================================================================
+// MODELO: Predicción Técnica
+// ============================================================================
+model TechnicalPrediction {
+  id                String    @id @default(uuid()) @db.Uuid
+  
+  // Resumen ejecutivo
+  projectName       String    @map("project_name") @db.VarChar(255)
+  projectSummary    String?   @map("project_summary") @db.Text
+  scopeDescription  String?   @map("scope_description") @db.Text
+  projectType       String    @default("OTHER") @map("project_type") @db.VarChar(50)
+  
+  // Stack tecnológico recomendado (JSON)
+  technologyStack   Json      @map("technology_stack")
+  // Estructura: { frontend: [], backend: [], database: [], infrastructure: [], tools: [] }
+  
+  // Perfiles requeridos (JSON)
+  requiredProfiles  Json      @map("required_profiles")
+  // Estructura: [{ role: string, level: string, quantity: number, hourlyRateMXN: number, responsibilities: [], skills: [] }]
+  
+  // Desglose por módulos (JSON)
+  moduleBreakdown   Json      @map("module_breakdown")
+  // Estructura: [{ name: string, description: string, hours: number, complexity: string, dependencies: [] }]
+  
+  // Estimación de tiempo
+  totalHours        Int       @map("total_hours")
+  totalWeeks        Float     @map("total_weeks")
+  totalMonths       Float     @map("total_months")
+  
+  // Modelo de estimación utilizado
+  estimationModel   String?   @map("estimation_model") @db.VarChar(50)
+  confidenceLevel   Int?      @default(75) @map("confidence_level") // Porcentaje 0-100
+  complexityScore   Int?      @map("complexity_score") // 1-10
+  
+  // Costos (en MXN y USD)
+  totalCostMXN      Float     @map("total_cost_mxn")
+  totalCostUSD      Float     @map("total_cost_usd")
+  developmentCostMXN Float    @map("development_cost_mxn")
+  infrastructureCostMXN Float @map("infrastructure_cost_mxn")
+  contingencyPercentage Float @default(15) @map("contingency_percentage")
+  
+  // Desglose de costos completo (JSON)
+  costBreakdown     Json      @map("cost_breakdown")
+  // Estructura completa de Costs del tipo TechnicalPredictionData
+  
+  // Timeline (JSON)
+  timeline          Json?     @map("timeline")
+  // Estructura: { phases: [{ name, weeks, deliverables, milestones }] }
+  
+  // Riesgos y consideraciones
+  risks             Json?     @map("risks")
+  // Estructura: [{ description, probability, impact, mitigation }]
+  
+  assumptions       String[]  @map("assumptions")
+  recommendations   String[]  @map("recommendations")
+  
+  // Timestamps
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  
+  // Relación con Chat (1:1)
+  chatId            String    @unique @map("chat_id") @db.Uuid
+  chat              Chat      @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  
+  // Relación con Usuario
+  userId            String    @map("user_id") @db.Uuid
+
+  @@index([createdAt])
+  @@index([userId])
+  @@map("technical_predictions")
+}
+
+// ============================================================================
+// MODELO: Retroalimentación (para aprendizaje)
+// ============================================================================
+model PredictionFeedback {
+  id                  String    @id @default(uuid()) @db.Uuid
+  
+  // Valores reales después del proyecto
+  actualHours         Int?      @map("actual_hours")
+  actualCost          Decimal?  @map("actual_cost") @db.Decimal(12, 2)
+  actualDurationWeeks Float?    @map("actual_duration_weeks")
+  
+  // Comparación
+  hoursVariance       Float?    @map("hours_variance") // Porcentaje de variación
+  costVariance        Float?    @map("cost_variance")
+  
+  // Feedback cualitativo
+  accuracyRating      Int?      @map("accuracy_rating") // 1-5
+  comments            String?   @db.Text
+  lessonsLearned      String?   @map("lessons_learned") @db.Text
+  
+  // Timestamps
+  createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  
+  // Relación con Predicción
+  predictionId        String    @unique @map("prediction_id") @db.Uuid
+
+  @@map("prediction_feedback")
+}

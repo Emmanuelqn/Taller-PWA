@@ -62,7 +62,6 @@ export default function ChatExample() {
       },
       onComplete: () => {
         setStreaming(false);
-        console.log('✅ Stream completado');
       },
       onError: (error) => {
         setStreaming(false);
